@@ -5,7 +5,7 @@ on:
     paths: ['*.swift', 'Info.plist', '.github/workflows/build-macos.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: macos-15
@@ -45,3 +45,13 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 30
+      - name: Publish downloadable application
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v1.0.${GITHUB_RUN_NUMBER}"
+          printf '%s\n' 'macOS 12 及以上；同时支持 Apple 芯片和 Intel。' '' '下载 WorkCheer-Mac.dmg，打开后将「上班鼓励器」拖入 Applications。无需终端或开发工具。' '' '默认周一至周五 09:00–18:00 自动计薪，可修改工资和排班。菜单栏「薪」可恢复悬浮窗或退出。' '' '此版本使用本地临时签名，未经过 Apple 公证。首次打开如被系统拦截，请先核实下载来源，再参照 Apple 官方说明：https://support.apple.com/102445 。' '' '验证：双架构编译、计薪自检、签名完整性及 DMG 校验。桌面交互尚需实际设备验证。' > release-notes.md
+          gh release create "$TAG" dist/WorkCheer-Mac.dmg dist/WorkCheer-Mac.zip dist/SHA256SUMS.txt --target "$GITHUB_SHA" --title "上班鼓励器 Mac $TAG" --notes-file release-notes.md
+
