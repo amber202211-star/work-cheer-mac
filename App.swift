@@ -17,7 +17,7 @@ final class Store: ObservableObject {
     }
 }
 
-private let background = Color(red: 0.078, green: 0.098, blue: 0.082)
+private let appBackground = Color(red: 0.078, green: 0.098, blue: 0.082)
 private let muted = Color(red: 0.70, green: 0.75, blue: 0.65)
 private let gold = Color(red: 0.91, green: 0.82, blue: 0.59)
 
@@ -49,47 +49,56 @@ struct Dashboard: View {
         let n = c.dateComponents([.day], from: base, to: c.startOfDay(for: now)).day ?? 0
         return "今日宜" + list[(n % list.count + list.count) % list.count]
     }
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Group {
+    private var headingSection: some View {
+        VStack(alignment: .leading, spacing: 15) {
             HStack {
                 Text("上班鼓励器").font(.system(size: 21, weight: .medium))
                 Spacer()
                 Button(action: hide) { Image(systemName: "minus").frame(width: 30, height: 26) }.help("收起到菜单栏")
             }
-            Text(dateLabel + "  ·  " + status).font(.system(size: 13)).foregroundColor(muted).padding(.top, 15)
-            Text("今日已赚").font(.system(size: 13)).foregroundColor(muted).padding(.top, 24)
+            Text(dateLabel + "  ·  " + status).font(.system(size: 13)).foregroundColor(muted)
+        }
+    }
+    private var incomeSection: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Text("今日已赚").font(.system(size: 13)).foregroundColor(muted)
             Text(String(format: "¥ %.4f", payroll.earnings(day, now: now)))
                 .font(.system(size: 43, weight: .regular, design: .rounded)).monospacedDigit()
-                .foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.45).padding(.top, 5)
-            Text(String(format: "每秒进账 ¥%.4f", payroll.rate(day))).font(.system(size: 13)).foregroundColor(muted).padding(.top, 9)
-            }
-            Group {
-            Rectangle().fill(muted.opacity(0.2)).frame(height: 1).padding(.vertical, 21)
+                .foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.45)
+            Text(String(format: "每秒进账 ¥%.4f", payroll.rate(day))).font(.system(size: 13)).foregroundColor(muted)
+        }.padding(.top, 24)
+    }
+    private var progressSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Text(working ? "距离下班还有" : "距离下次上班").font(.system(size: 13)).foregroundColor(muted)
-            Text(countdown).font(.system(size: 29, weight: .regular, design: .rounded)).monospacedDigit().padding(.top, 6)
+            Text(countdown).font(.system(size: 29, weight: .regular, design: .rounded)).monospacedDigit()
             Text(String(format: "已工作 %.2f / %.2f 小时   ·   %.1f%%", elapsed / 3600, duration / 3600, min(100, elapsed / duration * 100)))
-                .font(.system(size: 12)).foregroundColor(muted).padding(.top, 17)
-            GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(muted.opacity(0.2))
-                    Capsule().fill(muted).frame(width: proxy.size.width * CGFloat(min(1, elapsed / duration)))
-                }
-            }.frame(height: 6).padding(.top, 10)
-            }
-            Group {
-            Text(String(format: "本月累计  ¥%.2f", payroll.monthTotal(now))).font(.system(size: 20)).foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.5).padding(.top, 20)
-            Text("生活的底气，正在一秒一秒攒起来。").font(.system(size: 12)).foregroundColor(muted).padding(.top, 12)
-            Spacer(minLength: 12)
+                .font(.system(size: 12)).foregroundColor(muted).padding(.top, 7)
+            ProgressView(value: min(1, elapsed / duration)).tint(muted)
+        }
+    }
+    private var footerSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(String(format: "本月累计  ¥%.2f", payroll.monthTotal(now))).font(.system(size: 20)).foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.5)
+            Text("生活的底气，正在一秒一秒攒起来。").font(.system(size: 12)).foregroundColor(muted)
             HStack {
                 Text(Payroll.clock(store.settings.startMinute) + " — " + Payroll.clock(store.settings.endMinute) + " · 自动计薪").font(.system(size: 12)).foregroundColor(muted)
                 Spacer()
                 Button("设置", action: configure)
             }
-            Text(daily).font(.system(size: 12)).foregroundColor(gold).padding(.top, 10)
-            }
+            Text(daily).font(.system(size: 12)).foregroundColor(gold)
         }
-        .padding(24).frame(width: 390, height: 520).background(background)
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            headingSection
+            incomeSection
+            Rectangle().fill(muted.opacity(0.2)).frame(height: 1).padding(.vertical, 21)
+            progressSection
+            Spacer(minLength: 20)
+            footerSection
+        }
+        .padding(24).frame(width: 390, height: 520).background(appBackground)
         .foregroundColor(Color(red: 0.93, green: 0.94, blue: 0.90))
         .preferredColorScheme(.dark).onReceive(timer) { now = $0 }
     }
