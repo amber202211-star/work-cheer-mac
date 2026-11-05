@@ -13,9 +13,23 @@
 
 ## 当前状态
 
-这是原生 SwiftUI / AppKit 源码。**尚未在 macOS 上编译及实测，没有已验证的应用安装包。** 构建脚本会在目标 Mac 上编译并运行计薪自检，成功后生成 `.app`。
+已在 GitHub 的 macOS 环境完成 Apple 芯片和 Intel 双架构编译，通过计薪自检、签名完整性及 DMG 校验。桌面交互尚需实际设备验证。
 
-## 在 Mac 上生成应用
+## 直接下载安装
+
+[下载 Mac 安装包（DMG）](https://github.com/amber202211-star/work-cheer-mac/releases/latest/download/WorkCheer-Mac.dmg)
+
+1. 下载并打开 `WorkCheer-Mac.dmg`。
+2. 将「上班鼓励器」拖入 `Applications`（应用程序）。
+3. 从应用程序中打开；点击菜单栏「薪」可恢复悬浮窗或退出。
+
+支持 macOS 12 及以上，Apple 芯片和 Intel。无需终端、Xcode 或编译工具。
+
+此版本未经过 Apple 公证。若首次打开被系统拦截，请核实下载来源后参照 [Apple 官方说明](https://support.apple.com/102445) 在「隐私与安全性」中确认打开；不需要关闭系统安全保护。
+
+安装文件、压缩包和校验值见 [Releases](https://github.com/amber202211-star/work-cheer-mac/releases/latest)。
+
+## 在 Mac 上从源码生成应用
 
 目标系统：macOS 12 或更新版本。支持在 Apple 芯片或 Intel Mac 上生成对应架构的版本。
 
@@ -49,3 +63,4 @@ bash Build.command
 | `使用说明.txt` | 中文使用步骤 |
 
 计薪自检覆盖：上班前不计薪、09:00 起累计、下班截止、非工作日、整月工资、下次排班和跨午夜。
+
