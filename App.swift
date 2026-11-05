@@ -51,6 +51,7 @@ struct Dashboard: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            Group {
             HStack {
                 Text("上班鼓励器").font(.system(size: 21, weight: .medium))
                 Spacer()
@@ -62,6 +63,8 @@ struct Dashboard: View {
                 .font(.system(size: 43, weight: .regular, design: .rounded)).monospacedDigit()
                 .foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.45).padding(.top, 5)
             Text(String(format: "每秒进账 ¥%.4f", payroll.rate(day))).font(.system(size: 13)).foregroundColor(muted).padding(.top, 9)
+            }
+            Group {
             Rectangle().fill(muted.opacity(0.2)).frame(height: 1).padding(.vertical, 21)
             Text(working ? "距离下班还有" : "距离下次上班").font(.system(size: 13)).foregroundColor(muted)
             Text(countdown).font(.system(size: 29, weight: .regular, design: .rounded)).monospacedDigit().padding(.top, 6)
@@ -70,9 +73,11 @@ struct Dashboard: View {
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
                     Capsule().fill(muted.opacity(0.2))
-                    Capsule().fill(muted).frame(width: proxy.size.width * min(1, elapsed / duration))
+                    Capsule().fill(muted).frame(width: proxy.size.width * CGFloat(min(1, elapsed / duration)))
                 }
             }.frame(height: 6).padding(.top, 10)
+            }
+            Group {
             Text(String(format: "本月累计  ¥%.2f", payroll.monthTotal(now))).font(.system(size: 20)).foregroundColor(gold).lineLimit(1).minimumScaleFactor(0.5).padding(.top, 20)
             Text("生活的底气，正在一秒一秒攒起来。").font(.system(size: 12)).foregroundColor(muted).padding(.top, 12)
             Spacer(minLength: 12)
@@ -82,6 +87,7 @@ struct Dashboard: View {
                 Button("设置", action: configure)
             }
             Text(daily).font(.system(size: 12)).foregroundColor(gold).padding(.top, 10)
+            }
         }
         .padding(24).frame(width: 390, height: 520).background(background)
         .foregroundColor(Color(red: 0.93, green: 0.94, blue: 0.90))
@@ -190,3 +196,4 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         withExtendedLifetime(delegate) { app.run() }
     }
 }
+
